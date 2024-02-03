@@ -1,12 +1,17 @@
 package com.example.dividend.web;
 
+import com.example.dividend.entity.CompanyEntity;
 import com.example.dividend.exception.DividendException;
 import com.example.dividend.model.Company;
 import com.example.dividend.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.example.dividend.model.type.ErrorCode.TICKER_NOT_FOUND;
 
@@ -23,14 +28,13 @@ public class CompanyController {
     }
 
     @GetMapping
-    public ResponseEntity<?> searchCompany(){
-        return null;
+    public ResponseEntity<?> searchCompany(final Pageable pageable){
+        Page<CompanyEntity> companies = companyService.getAllCompany(pageable);
+        return ResponseEntity.ok(companies);
     }
 
     @PostMapping
-    public ResponseEntity<?> addCompany(
-            @RequestBody Company request
-    ){
+    public ResponseEntity<?> addCompany(@RequestBody Company request){
         String ticker = request.getTicker();
         if(ObjectUtils.isEmpty(ticker)){
             throw new DividendException(TICKER_NOT_FOUND);
