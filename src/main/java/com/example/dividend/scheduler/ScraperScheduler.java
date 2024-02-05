@@ -7,18 +7,17 @@ import com.example.dividend.model.Company;
 import com.example.dividend.model.ScrapedResult;
 import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
-import javassist.Loader;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
 @Component
+@EnableCaching
 @AllArgsConstructor
 public class ScraperScheduler {
     
@@ -27,20 +26,7 @@ public class ScraperScheduler {
 
     private final Scrapper yahooFinanceScrapper;
 
-    @Scheduled(fixedDelay = 1000)
-    public void test1() throws InterruptedException {
-        Thread.sleep(10000); // 10초간 일시정지
-        System.out.println(Thread.currentThread().getName() + " -> 테스트 1 : " +
-                LocalDateTime.now());
-    }
-
-    @Scheduled(fixedDelay = 1000)
-    public void test2() throws InterruptedException {
-        System.out.println(Thread.currentThread().getName() + " -> 테스트 2 : " +
-                LocalDateTime.now());
-    }
-
-//    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling(){
         log.info("scraping scheduler is started");
                 // 저장된 회사 목록을 조회
@@ -50,14 +36,11 @@ public class ScraperScheduler {
         for(CompanyEntity company : companies){
             log.info("scraping scheduler is started -> " + company.getName());
             ScrapedResult scrapedResult = yahooFinanceScrapper.scrap(
-                    Company.builder()
-                            .name(company.getName())
-                            .ticker(company.getTicker())
-                            .build()
+                    new Company(company.getTicker(), company.getName())
             );
 
             // 스크래핑한 배당금 정보 중 데이터베이스에 없는 값은 저장
-            scrapedResult.getDividends().stream()
+            scrapedResult.getDividendEntities().stream()
                     // dividend 모델을 dividend entity로 매핑
                     .map(e -> DividendEntity.builder()
                             .companyId(company.getId())

@@ -9,6 +9,8 @@ import com.example.dividend.model.ScrapedResult;
 import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.example.dividend.model.type.ErrorCode.COMPANY_NAME_NOT_FOUND;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FinanceService {
@@ -23,6 +26,7 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
+    @Cacheable(key = "#companyName", value = "finance")
     public ScrapedResult getDividendByCompanyName(String companyName) {
 
         // 회사명을 기준으로 회사 정보를 조회
@@ -38,14 +42,11 @@ public class FinanceService {
 
         // 결과 조합 후 반환
         List<Dividend> dividends = dividendEntities.stream()
-                .map(e -> Dividend.builder()
-                        .date(e.getDate())
-                        .dividend(e.getDividend())
-                        .build()
-        ).collect(Collectors.toList());
+                .map(e -> new Dividend(e.getDate(), e.getDividend()))
+                .collect(Collectors.toList());
 
-        return new ScrapedResult(Company.builder()
-                .ticker(companyEntity.getTicker())
-                .name(companyEntity.getName()).build(), dividends);
+        return new ScrapedResult(
+                new Company(companyEntity.getTicker(), companyEntity.getName()),
+                dividends);
     }
 }

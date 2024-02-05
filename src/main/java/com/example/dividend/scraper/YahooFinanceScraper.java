@@ -61,12 +61,13 @@ public class YahooFinanceScraper implements Scrapper {
                             + splits[0]);
                 }
 
-                dividends.add(Dividend.builder()
-                        .date(LocalDateTime.of(year, month, day, 0, 0))
-                        .dividend(dividend)
-                        .build());
+                dividends.add(new Dividend(
+                        LocalDateTime.of(year, month, day, 0, 0),
+                        dividend
+                        )
+                );
             }
-            scrapResult.setDividends(dividends);
+            scrapResult.setDividendEntities(dividends);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,10 +91,7 @@ public class YahooFinanceScraper implements Scrapper {
                 title = title.substring(0, index - 1);
             }
 
-            return Company.builder()
-                    .ticker(ticker)
-                    .name(title)
-                    .build();
+            return new Company(ticker, title);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

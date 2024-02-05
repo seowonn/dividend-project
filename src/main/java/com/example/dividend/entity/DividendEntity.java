@@ -1,5 +1,6 @@
 package com.example.dividend.entity;
 
+import com.example.dividend.model.Dividend;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -30,4 +31,9 @@ public class DividendEntity {
 
     private String dividend;
 
+    public DividendEntity(Long companyId, Dividend dividend) {
+        this.companyId = companyId;
+        this.date = dividend.getDate();
+        this.dividend = dividend.getDividend();
+    }
 }

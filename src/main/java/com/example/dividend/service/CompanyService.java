@@ -65,7 +65,7 @@ public class CompanyService {
         );
 
         List<DividendEntity> dividendEntities =
-                scrapedResult.getDividends().stream()
+                scrapedResult.getDividendEntities().stream()
                 .map(e -> DividendEntity.builder()
                         .companyId(companyEntity.getId())
                         .date(e.getDate())
