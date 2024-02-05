@@ -1,4 +1,4 @@
-package com.example.dividend.web;
+package com.example.dividend.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

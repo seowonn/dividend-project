@@ -1,4 +1,4 @@
-package com.example.dividend.web;
+package com.example.dividend.controller;
 
 import com.example.dividend.entity.CompanyEntity;
 import com.example.dividend.exception.DividendException;
