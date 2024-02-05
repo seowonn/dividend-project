@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static com.example.dividend.model.type.ErrorCode.TICKER_NOT_FOUND;
 
 @RestController
@@ -24,7 +22,7 @@ public class CompanyController {
 
     @GetMapping("/autocomplete")
     public ResponseEntity<?> autocomplete(@RequestParam("keyword") String keyword){
-        return null;
+        return ResponseEntity.ok(companyService.getCompanyNamesByKeyword(keyword));
     }
 
     @GetMapping
@@ -40,6 +38,7 @@ public class CompanyController {
             throw new DividendException(TICKER_NOT_FOUND);
         }
         Company company = companyService.save(ticker);
+        companyService.addAutocompleteKeyword(company.getName());
         return ResponseEntity.ok(company);
     }
 
