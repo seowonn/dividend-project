@@ -5,10 +5,12 @@ import com.example.dividend.entity.CompanyEntity;
 import com.example.dividend.entity.DividendEntity;
 import com.example.dividend.model.Company;
 import com.example.dividend.model.ScrapedResult;
+import com.example.dividend.model.type.CacheKey;
 import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,10 +28,11 @@ public class ScraperScheduler {
 
     private final Scrapper yahooFinanceScrapper;
 
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling(){
         log.info("scraping scheduler is started");
-                // 저장된 회사 목록을 조회
+        // 저장된 회사 목록을 조회
         List<CompanyEntity> companies = companyRepository.findAll();
 
         // 회사마다 배당금 정보를 새로 스크래핑

@@ -6,6 +6,7 @@ import com.example.dividend.exception.DividendException;
 import com.example.dividend.model.Company;
 import com.example.dividend.model.Dividend;
 import com.example.dividend.model.ScrapedResult;
+import com.example.dividend.model.type.CacheKey;
 import com.example.dividend.repository.CompanyRepository;
 import com.example.dividend.repository.DividendRepository;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
-    @Cacheable(key = "#companyName", value = "finance")
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyName) {
 
         // 회사명을 기준으로 회사 정보를 조회
