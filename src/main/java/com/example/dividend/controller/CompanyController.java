@@ -5,14 +5,18 @@ import com.example.dividend.exception.DividendException;
 import com.example.dividend.model.Company;
 import com.example.dividend.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.dividend.model.type.ErrorCode.TICKER_NOT_FOUND;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/company")
@@ -26,12 +30,20 @@ public class CompanyController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('READ')")
     public ResponseEntity<?> searchCompany(final Pageable pageable){
+        log.info("pageable : " + pageable);
         Page<CompanyEntity> companies = companyService.getAllCompany(pageable);
         return ResponseEntity.ok(companies);
     }
 
+    /**
+     * 회사 및 배당금 정보 추가
+     * @param request
+     * @return
+     */
     @PostMapping
+    @PreAuthorize("hasRole('WRITE')")
     public ResponseEntity<?> addCompany(@RequestBody Company request){
         String ticker = request.getTicker();
         if(ObjectUtils.isEmpty(ticker)){
