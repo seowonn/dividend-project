@@ -57,7 +57,6 @@ public class TokenProvider {
 
     // jwt 토큰으로부터 인증 정보를 가져오는 메서드
     public Authentication getAuthentication(String jwt) {
-        log.info("jwt" + jwt);
         assert this.memberService != null;
         UserDetails userDetails =
                 this.memberService.loadUserByUsername(this.getUsername(jwt));

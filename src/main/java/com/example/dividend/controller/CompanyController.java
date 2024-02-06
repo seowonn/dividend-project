@@ -54,6 +54,7 @@ public class CompanyController {
         }
         Company company = companyService.save(ticker);
         companyService.addAutocompleteKeyword(company.getName());
+        log.info("new company added : " + company.getName());
         return ResponseEntity.ok(company);
     }
 
@@ -64,6 +65,7 @@ public class CompanyController {
     ){
         String companyName = this.companyService.deleteCompany(ticker);
         clearFinanceCache(companyName);
+        log.info("company deleted : " + companyName);
         return ResponseEntity.ok(companyName);
     }
 
