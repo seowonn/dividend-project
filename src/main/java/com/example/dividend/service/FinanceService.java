@@ -2,7 +2,7 @@ package com.example.dividend.service;
 
 import com.example.dividend.entity.CompanyEntity;
 import com.example.dividend.entity.DividendEntity;
-import com.example.dividend.exception.DividendException;
+import com.example.dividend.exception.impl.NoCompanyException;
 import com.example.dividend.model.Company;
 import com.example.dividend.model.Dividend;
 import com.example.dividend.model.ScrapedResult;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.example.dividend.model.type.ErrorCode.COMPANY_NAME_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -33,9 +31,7 @@ public class FinanceService {
         // 회사명을 기준으로 회사 정보를 조회
         CompanyEntity companyEntity =
                 companyRepository.findByName(companyName)
-                        .orElseThrow(
-                                () -> new DividendException(COMPANY_NAME_NOT_FOUND)
-                        );
+                        .orElseThrow(NoCompanyException::new);
 
         // 조회된 회사 ID로 배당금 정보를 조회
         List<DividendEntity> dividendEntities =

@@ -1,7 +1,7 @@
 package com.example.dividend.controller;
 
 import com.example.dividend.entity.CompanyEntity;
-import com.example.dividend.exception.DividendException;
+import com.example.dividend.exception.impl.NoTickerException;
 import com.example.dividend.model.Company;
 import com.example.dividend.model.type.CacheKey;
 import com.example.dividend.service.CompanyService;
@@ -16,8 +16,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-
-import static com.example.dividend.model.type.ErrorCode.TICKER_NOT_FOUND;
 
 @Slf4j
 @RestController
@@ -52,7 +50,7 @@ public class CompanyController {
     public ResponseEntity<?> addCompany(@RequestBody Company request){
         String ticker = request.getTicker();
         if(ObjectUtils.isEmpty(ticker)){
-            throw new DividendException(TICKER_NOT_FOUND);
+            throw new NoTickerException();
         }
         Company company = companyService.save(ticker);
         companyService.addAutocompleteKeyword(company.getName());

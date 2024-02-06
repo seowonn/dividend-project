@@ -3,7 +3,9 @@ package com.example.dividend.service;
 import com.example.dividend.aop.Scrapper;
 import com.example.dividend.entity.CompanyEntity;
 import com.example.dividend.entity.DividendEntity;
-import com.example.dividend.exception.DividendException;
+import com.example.dividend.exception.impl.AlreadyExistTickerException;
+import com.example.dividend.exception.impl.NoCompanyException;
+import com.example.dividend.exception.impl.NoTickerException;
 import com.example.dividend.model.Company;
 import com.example.dividend.model.ScrapedResult;
 import com.example.dividend.repository.CompanyRepository;
@@ -20,9 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.dividend.model.type.ErrorCode.TICKER_ALREADY_EXISTS;
-import static com.example.dividend.model.type.ErrorCode.TICKER_NOT_FOUND;
-
 @Service
 @AllArgsConstructor
 public class CompanyService {
@@ -36,7 +35,7 @@ public class CompanyService {
     public Company save(String ticker) {
         boolean exists = companyRepository.existsByTicker(ticker);
         if(exists){
-            throw new DividendException(TICKER_ALREADY_EXISTS);
+            throw new AlreadyExistTickerException();
         }
         return storeCompanyAndDividend(ticker);
     }
@@ -50,7 +49,7 @@ public class CompanyService {
         Company company = yahooFinanceScrapper.scrapCompanyByTicker(ticker);
 
         if (ObjectUtils.isEmpty(company)) {
-            throw new DividendException(TICKER_NOT_FOUND);
+            throw new NoTickerException();
         }
 
         // 해당 회사가 존재할 경우, 회사의 배당금 정보를 스크래핑
@@ -102,7 +101,7 @@ public class CompanyService {
 
     public String deleteCompany(String ticker) {
         CompanyEntity companyEntity = this.companyRepository.findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다"));
+                .orElseThrow(NoCompanyException::new);
 
         this.dividendRepository.deleteAllByCompanyId(companyEntity.getId());
         this.companyRepository.delete(companyEntity);
