@@ -99,4 +99,16 @@ public class CompanyService {
     public void deleteAutocompleteKeyword(String keyword){
         trie.remove(keyword);
     }
+
+    public String deleteCompany(String ticker) {
+        CompanyEntity companyEntity = this.companyRepository.findByTicker(ticker)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회사입니다"));
+
+        this.dividendRepository.deleteAllByCompanyId(companyEntity.getId());
+        this.companyRepository.delete(companyEntity);
+
+        // 자동 완성 기능을 위해 사용한 trie에 저장된 이름도 같이 지워줘야 한다.
+        this.deleteAutocompleteKeyword(companyEntity.getName());
+        return companyEntity.getName();
+    }
 }
